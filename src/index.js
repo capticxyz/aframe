@@ -91,12 +91,12 @@ require('./core/a-mixin');
 // Extras.
 require('./extras/components/');
 require('./extras/primitives/');
-
+/*
 console.log('A-Frame Version: 1.5.0 (Date 2024-01-31, Commit #d9d12590)');
 console.log('THREE Version (https://github.com/supermedium/three.js):',
             pkg.dependencies['super-three']);
 console.log('WebVR Polyfill Version:', pkg.dependencies['webvr-polyfill']);
-
+*/
 module.exports = window.AFRAME = {
   AComponent: require('./core/component').Component,
   AEntity: AEntity,

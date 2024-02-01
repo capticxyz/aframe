@@ -57,10 +57,7 @@ module.exports.System = registerSystem('material', {
     }
 
     // Video element.
-    if (src.tagName === 'VIDEO') {
-      if (!src.src && !src.srcObject && !src.childElementCount) {
-        warn('Video element was defined with neither `source` elements nor `src` / `srcObject` attributes.');
-      }
+    if (src.tagName === 'VIDEO' || src.endsWith("mp4") || src.endsWith("webm") ) {
       this.loadVideo(src, data, cb);
       return;
     }
@@ -323,13 +320,29 @@ function createVideoEl (src, width, height) {
   // Support inline videos for iOS webviews.
   videoEl.setAttribute('playsinline', '');
   videoEl.setAttribute('webkit-playsinline', '');
-  videoEl.autoplay = true;
+ //videoEl.autoplay = true;
   videoEl.loop = true;
+  videoEl.muted = true;
+  videoEl.preload = "metadata";
   videoEl.crossOrigin = 'anonymous';
-  videoEl.addEventListener('error', function () {
-    warn('`$s` is not a valid video', src);
-  }, true);
-  videoEl.src = src;
+  videoEl.src = src.toString();
+  videoEl.addEventListener("loadedmetadata", getmetadata);
+  function getmetadata(){
+    	var playPromise =  videoEl.play();
+      if (playPromise !== undefined) {
+         playPromise.then(_ => {
+          // Automatic playback started!
+         // Show playing UI.
+       })
+      .catch(error => {
+        // Auto-play was prevented
+        // Show paused UI.
+      });
+     }
+  }
+  if (videoEl.readyState >= 2) {
+	  getmetadata();
+  }
   return videoEl;
 }
 

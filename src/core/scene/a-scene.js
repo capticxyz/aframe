@@ -358,12 +358,6 @@ class AScene extends AEntity {
         window.dispatchEvent(event);
       }
 
-      if (useAR) {
-        self.addState('ar-mode');
-      } else {
-        self.addState('vr-mode');
-      }
-      self.emit('enter-vr', {target: self});
       // Lock to landscape orientation on mobile.
       if (!self.hasWebXR && self.isMobile && screen.orientation && screen.orientation.lock) {
         screen.orientation.lock('landscape');
@@ -376,8 +370,15 @@ class AScene extends AEntity {
       // connected.
       if (!self.isMobile && !self.checkHeadsetConnected()) {
         requestFullscreen(self.canvas);
-      }
+      } else {
+        if (useAR) {
+        self.addState('ar-mode');
+      } else {
+        self.addState('vr-mode');
+        self.emit('enter-vr', {target: self});
+      }}
 
+      
       self.resize();
       if (resolve) { resolve(); }
     }
@@ -634,13 +635,29 @@ class AScene extends AEntity {
       };
     }
 
-    renderer = this.renderer = new THREE.WebGLRenderer(rendererConfig);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    
+    
 
+
+    const IS_IOS = typeof navigator !== "undefined" && (/iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+    if(IS_IOS) {
+       renderer = this.renderer = new THREE.WebGL1Renderer(rendererConfig);
+       console.info("WEBGL1")
+    }  
+    else { 
+    renderer = this.renderer = new THREE.WebGLRenderer(rendererConfig);
+    console.info("WEBGL2")
+   }
+
+   renderer.setPixelRatio(window.devicePixelRatio);
+
+
+/*
     if (this.camera) { renderer.xr.setPoseTarget(this.camera.el.object3D); }
     this.addEventListener('camera-set-active', function () {
       renderer.xr.setPoseTarget(self.camera.el.object3D);
     });
+  */  
   }
 
   /**
@@ -850,6 +867,7 @@ function getMaxSize (maxSize, isVR) {
 }
 
 function requestFullscreen (canvas) {
+  canvas =  document.documentElement
   var requestFullscreen =
     canvas.requestFullscreen ||
     canvas.webkitRequestFullscreen ||
@@ -857,6 +875,7 @@ function requestFullscreen (canvas) {
     canvas.msRequestFullscreen;
   // Hide navigation buttons on Android.
   requestFullscreen.apply(canvas, [{navigationUI: 'hide'}]);
+
 }
 
 function exitFullscreen () {

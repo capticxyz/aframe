@@ -95,6 +95,13 @@ function checkIsImage (src, onResult) {
     onResult(src.tagName === 'IMG');
     return;
   }
+
+  if (src.endsWith(".webp") || src.endsWith(".jpg") || src.endsWith(".jpeg") || src.endsWith(".png")) {
+    // avoid doing a HEAD request to detect mime type
+    onResult(true);
+    return;
+  }
+  
   request = new XMLHttpRequest();
 
   // Try to send HEAD request to check if image first.

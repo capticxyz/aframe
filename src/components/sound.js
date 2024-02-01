@@ -237,8 +237,9 @@ module.exports.Component = registerComponent('sound', {
     }
 
     if (!found) {
-      warn('All the sounds are playing. If you need to play more sounds simultaneously ' +
+      /*warn('All the sounds are playing. If you need to play more sounds simultaneously ' +
            'consider increasing the size of pool with the `poolSize` attribute.', this.el);
+      */
       return;
     }
 

@@ -45,8 +45,8 @@ var FRAGMENT_SHADER = [
  */
 module.exports.Component = registerComponent('screenshot', {
   schema: {
-    width: {default: 4096},
-    height: {default: 2048},
+    width: {default: 16048},
+    height: {default: 16048/2},
     camera: {type: 'selector'}
   },
 
@@ -161,8 +161,8 @@ module.exports.Component = registerComponent('screenshot', {
       el.camera.getWorldPosition(cubeCamera.position);
       el.camera.getWorldQuaternion(cubeCamera.quaternion);
       // Render scene with cube camera.
-      cubeCamera.update(el.renderer, el.object3D);
-      this.quad.material.uniforms.map.value = cubeCamera.renderTarget.texture;
+      cubeCamera.update(el.sceneEl.renderer, el.sceneEl.object3D);
+      //this.quad.material.uniforms.map.value = cubeCamera.renderTarget.texture;
       size = {width: this.data.width, height: this.data.height};
       // Use quad to project image taken by the cube camera.
       this.quad.visible = true;
@@ -222,8 +222,8 @@ module.exports.Component = registerComponent('screenshot', {
     renderer.autoClear = true;
     renderer.clear();
     renderer.setRenderTarget(output);
-    renderer.render(el.object3D, camera);
-    renderer.autoClear = autoClear;
+    renderer.render(el.sceneEl.object3D, camera);
+    //renderer.autoClear = autoClear;
     // Read image pizels back.
     renderer.readRenderTargetPixels(output, 0, 0, size.width, size.height, pixels);
     renderer.setRenderTarget(null);
@@ -231,6 +231,11 @@ module.exports.Component = registerComponent('screenshot', {
       pixels = this.flipPixelsVertically(pixels, size.width, size.height);
     }
     imageData = new ImageData(new Uint8ClampedArray(pixels), size.width, size.height);
+    /*const w = imageData.width, h = imageData.height;
+const data = imageData.data;
+Array.from({length: h}, (val, i) => data.slice(i * w * 4, (i + 1) * w * 4))
+        .forEach((val, i) => data.set(val, (h - i - 1) * w * 4));
+    */
     // Hide quad after projecting the image.
     this.quad.visible = false;
     // Copy pixels into canvas.
@@ -241,10 +246,10 @@ module.exports.Component = registerComponent('screenshot', {
     var flippedPixels = pixels.slice(0);
     for (var x = 0; x < width; ++x) {
       for (var y = 0; y < height; ++y) {
-        flippedPixels[x * 4 + y * width * 4] = pixels[x * 4 + (height - y) * width * 4];
-        flippedPixels[x * 4 + 1 + y * width * 4] = pixels[x * 4 + 1 + (height - y) * width * 4];
-        flippedPixels[x * 4 + 2 + y * width * 4] = pixels[x * 4 + 2 + (height - y) * width * 4];
-        flippedPixels[x * 4 + 3 + y * width * 4] = pixels[x * 4 + 3 + (height - y) * width * 4];
+        flippedPixels[x * 4 + y * width * 4] = pixels[x * 4 + (height - y - 1 ) * width * 4];
+        flippedPixels[x * 4 + 1 + y * width * 4] = pixels[x * 4 + 1 + (height - y - 1) * width * 4];
+        flippedPixels[x * 4 + 2 + y * width * 4] = pixels[x * 4 + 2 + (height - y - 1) * width * 4];
+        flippedPixels[x * 4 + 3 + y * width * 4] = pixels[x * 4 + 3 + (height - y - 1) * width * 4];
       }
     }
     return flippedPixels;
