@@ -49,34 +49,29 @@ module.exports.Component = registerComponent('screenshot', {
     height: {default: 2048},
     camera: {type: 'selector'}
   },
-
-  init: function () {
-    this.setupDone = false;
-  },
-
+  
   setup: function () {
     var el = this.el;
-    var self = this;
+    if (this.canvas) { return; }
     var gl = el.renderer.getContext();
     if (!gl) { return; }
-    self.cubeMapSize = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
-    self.material = new THREE.RawShaderMaterial({
+    this.cubeMapSize = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
+    this.material = new THREE.RawShaderMaterial({
       uniforms: {map: {type: 't', value: null}},
       vertexShader: VERTEX_SHADER,
       fragmentShader: FRAGMENT_SHADER,
       side: THREE.DoubleSide
     });
-    self.quad = new THREE.Mesh(
+    this.quad = new THREE.Mesh(
       new THREE.PlaneGeometry(1, 1),
-      self.material
+      this.material
     );
-    self.quad.visible = false;
-    self.camera = new THREE.OrthographicCamera(-1 / 2, 1 / 2, 1 / 2, -1 / 2, -10000, 10000);
-    self.canvas = document.createElement('canvas');
-    self.ctx = self.canvas.getContext('2d');
-    el.object3D.add(self.quad);
-    self.onKeyDown = self.onKeyDown.bind(self);
-    self.setupDone = true;
+    this.quad.visible = false;
+    this.camera = new THREE.OrthographicCamera(-1 / 2, 1 / 2, 1 / 2, -1 / 2, -10000, 10000);
+    this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d');
+    el.object3D.add(this.quad);
+    this.onKeyDown = this.onKeyDown.bind(this);
   },
 
   getRenderTarget: function (width, height) {
@@ -174,12 +169,10 @@ module.exports.Component = registerComponent('screenshot', {
    * Maintained for backwards compatibility.
    */
   capture: function (projection) {
-    if (!this.setupDone) {
-      this.setup();
-    }
     var isVREnabled = this.el.renderer.xr.enabled;
     var renderer = this.el.renderer;
     var params;
+    this.setup();
     // Disable VR.
     renderer.xr.enabled = false;
     params = this.setCapture(projection);
