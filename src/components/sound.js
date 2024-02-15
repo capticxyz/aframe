@@ -34,7 +34,7 @@ module.exports.Component = registerComponent('sound', {
     this.pool = new THREE.Group();
     this.loaded = false;
     this.mustPlay = false;
-
+    this.setupSound();
     // Don't pass evt because playSound takes a function as parameter.
     this.playSoundBound = function () { self.playSound(); };
   },
@@ -48,7 +48,6 @@ module.exports.Component = registerComponent('sound', {
     // Create new sound if not yet created or changing `src`.
     if (srcChanged) {
       if (!data.src) { return; }
-      this.setupSound();
     }
 
     for (i = 0; i < this.pool.children.length; i++) {
