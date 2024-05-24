@@ -1,4 +1,4 @@
-/* global Promise, screen, CustomEvent */
+/* global Promise, customElements, screen, CustomEvent */
 var initMetaTags = require('./metaTags').inject;
 var initWakelock = require('./wakelock');
 var loadingScreen = require('./loadingScreen');
@@ -640,6 +640,10 @@ class AScene extends AEntity {
         rendererConfig.alpha = rendererAttr.alpha === 'true';
       }
 
+      if (rendererAttr.stencil) {
+        rendererConfig.stencil = rendererAttr.stencil === 'true';
+      }
+
       if (rendererAttr.multiviewStereo) {
         rendererConfig.multiviewStereo = rendererAttr.multiviewStereo === 'true';
       }
@@ -792,7 +796,7 @@ class AScene extends AEntity {
 
       behaviorSet.inUse = true;
       for (i = 0; i < behaviorSet.array.length; i++) {
-        if (!behaviorSet.array[i].el.isPlaying) { continue; }
+        if (!behaviorSet.array[i].isPlaying) { continue; }
         behaviorSet.array[i][behavior](time, timeDelta);
       }
       behaviorSet.inUse = false;
@@ -916,7 +920,7 @@ function constrainSizeTo (size, maxSize) {
   return size;
 }
 
-window.customElements.define('a-scene', AScene);
+customElements.define('a-scene', AScene);
 
 /**
  * Return the canvas size where the scene will be rendered.
@@ -1001,7 +1005,7 @@ function setupCanvas (sceneEl) {
   document.addEventListener('MSFullscreenChange', onFullScreenChange);
 
   // Prevent overscroll on mobile.
-  canvasEl.addEventListener('touchmove', function (event) { event.preventDefault(); });
+  canvasEl.addEventListener('touchmove', function (event) { event.preventDefault(); }, {passive: false});
 
   // Set canvas on scene.
   sceneEl.canvas = canvasEl;

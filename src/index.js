@@ -78,9 +78,9 @@ require('./core/a-mixin');
 require('./extras/components/');
 require('./extras/primitives/');
 
-console.log('A-Frame Version: 1.5.0 (Date 2024-04-01, Commit #e0804548)');
+console.log('A-Frame Version: 1.6.0 (Date 2024-05-23, Commit #e6c47761)');
 console.log('THREE Version (https://github.com/supermedium/three.js):',
-            pkg.dependencies['super-three']);
+            THREE.REVISION);
 console.log('WebVR Polyfill Version:', pkg.dependencies['webvr-polyfill']);
 
 // Wait for ready state, unless user asynchronously initializes A-Frame.
