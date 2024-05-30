@@ -222,12 +222,29 @@ function createVideoEl (src) {
   // Support inline videos for iOS webviews.
   videoEl.setAttribute('playsinline', '');
   videoEl.setAttribute('webkit-playsinline', '');
-  videoEl.autoplay = true;
+  //videoEl.autoplay = true;
+  videoEl.muted = true;
+  videoEl.preload = "metadata";
   videoEl.loop = true;
   videoEl.crossOrigin = 'anonymous';
-  videoEl.addEventListener('error', function () {
-    warn('`%s` is not a valid video', src);
-  }, true);
+  videoEl.src = src.toString();
+  videoEl.addEventListener("loadedmetadata", getmetadata);
+  function getmetadata(){
+    	var playPromise =  videoEl.play();
+      if (playPromise !== undefined) {
+         playPromise.then(_ => {
+          // Automatic playback started!
+         // Show playing UI.
+       })
+      .catch(error => {
+        // Auto-play was prevented
+        // Show paused UI.
+      });
+     }
+  }
+  if (videoEl.readyState >= 2) {
+	  getmetadata();
+  }
   videoEl.src = src;
   return videoEl;
 }
