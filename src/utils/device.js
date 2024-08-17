@@ -146,6 +146,19 @@ function isIpad (mockUserAgent, mockDevicePlatform, mockDeviceTouchPoints) {
 }
 module.exports.isIpad = isIpad;
 
+/**
+ *  Detect Apple Vision Pro devices.
+*/
+function isAppleVisionPro () {
+  // Safari for Apple Vision Pro presents itself as a desktop browser.
+  var isMacintosh = navigator.userAgent.includes('Macintosh');
+  // Discriminates between a "real" desktop browser and Safari for Vision Pro.
+  // Note: need to check for posible false positives on iPhones / iPads.
+  var hasFiveTouchPoints = navigator.maxTouchPoints === 5;
+  return isMacintosh && hasFiveTouchPoints;
+}
+module.exports.isAppleVisionPro = isAppleVisionPro;
+
 function isIOS () {
   return /iPad|iPhone|iPod/.test(window.navigator.platform);
 }
@@ -176,7 +189,7 @@ module.exports.isFirefoxReality = isFirefoxReality;
  *  Detect browsers in Stand-Alone headsets
  */
 function isMobileVR () {
-  return isOculusBrowser() || isFirefoxReality();
+  return isOculusBrowser() || isFirefoxReality() || isAppleVisionPro();
 }
 module.exports.isMobileVR = isMobileVR;
 
@@ -200,9 +213,9 @@ module.exports.isLandscape = function () {
  * We need to check a node api that isn't mocked on either side.
  * `require` and `module.exports` are mocked in browser by bundlers.
  * `window` is mocked in node.
- * `process` is also mocked by webpack running with karma, but has custom properties like process.browser.
+ * `process` is also mocked by browserify, but has custom properties.
  */
-module.exports.isBrowserEnvironment = typeof process === 'undefined' || process.browser === true;
+module.exports.isBrowserEnvironment = !!(!process || process.browser);
 
 /**
  * Check if running in node on the server.
