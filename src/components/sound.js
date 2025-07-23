@@ -44,7 +44,13 @@ module.exports.Component = registerComponent('sound', {
     var i;
     var sound;
     var srcChanged = data.src !== oldData.src;
-
+    
+    // If `positional` changes, we need to recreate the sound objects.
+    var positionalChanged = data.positional !== oldData.positional && oldData.positional !== undefined;
+    if (positionalChanged) {
+      this.setupSound();
+    }
+    
     // Create new sound if not yet created or changing `src`.
     if (srcChanged) {
       if (!data.src) { return; }
@@ -77,7 +83,7 @@ module.exports.Component = registerComponent('sound', {
     }
 
     // All sound values set. Load in `src`.
-    if (srcChanged) {
+    if (srcChanged || (positionalChanged && data.src)) {
       var self = this;
 
       this.loaded = false;
@@ -154,7 +160,7 @@ module.exports.Component = registerComponent('sound', {
 
     if (this.pool.children.length > 0) {
       this.stopSound();
-      el.removeObject3D('sound');
+      el.removeObject3D(this.attrName);
     }
 
     // Only want one AudioListener. Cache it on the scene.
