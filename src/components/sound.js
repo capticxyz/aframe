@@ -34,7 +34,7 @@ export var Component = registerComponent('sound', {
     this.pool = new THREE.Group();
     this.loaded = false;
     this.mustPlay = false;
-
+    this.setupSound();
     // Don't pass evt because playSound takes a function as parameter.
     this.playSoundBound = function () { self.playSound(); };
   },
@@ -45,10 +45,16 @@ export var Component = registerComponent('sound', {
     var sound;
     var srcChanged = data.src !== oldData.src;
 
+
+     // If `positional` changes, we need to recreate the sound objects.
+    var positionalChanged = data.positional !== oldData.positional && oldData.positional !== undefined;
+    if (positionalChanged) {
+      this.setupSound();
+    }
+
     // Create new sound if not yet created or changing `src`.
     if (srcChanged) {
       if (!data.src) { return; }
-      this.setupSound();
     }
 
     for (i = 0; i < this.pool.children.length; i++) {
@@ -78,7 +84,7 @@ export var Component = registerComponent('sound', {
     }
 
     // All sound values set. Load in `src`.
-    if (srcChanged) {
+    if (srcChanged || (positionalChanged && data.src)) {
       var self = this;
 
       this.loaded = false;
@@ -153,7 +159,7 @@ export var Component = registerComponent('sound', {
 
     if (this.pool.children.length > 0) {
       this.stopSound();
-      el.removeObject3D('sound');
+      el.removeObject3D(this.attrName);
     }
 
     // Only want one AudioListener. Cache it on the scene.
@@ -234,12 +240,12 @@ export var Component = registerComponent('sound', {
       }
     }
 
-    if (!found) {
+   /* if (!found) {
       warn('All the sounds are playing. If you need to play more sounds simultaneously ' +
            'consider increasing the size of pool with the `poolSize` attribute.', this.el);
       return;
     }
-
+*/
     this.mustPlay = false;
     this.processSound = undefined;
   },
