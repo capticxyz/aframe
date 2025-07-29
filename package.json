@@ -9,7 +9,8 @@
     ".": {
       "import": "./dist/aframe-master.module.min.js",
       "require": "./dist/aframe-master.js"
-    }
+    },
+    "./src/index.js": "./src/index.js"
   },
   "scripts": {
     "dev": "cross-env INSPECTOR_VERSION=dev webpack serve --port 8080",
