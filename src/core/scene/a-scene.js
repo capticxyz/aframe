@@ -350,26 +350,31 @@ export class AScene extends AEntity {
     // No VR.
     enterVRSuccess();
     return Promise.resolve();
+   // Callback that happens on enter VR success or enter fullscreen (any API).
 
-    // Callback that happens on enter VR success or enter fullscreen (any API).
-    function enterVRSuccess (resolve) {
-      if (useAR) {
+  function enterVRSuccess (resolve) {
+       if (!self.isMobile && !self.checkHeadsetConnected()) {
+        console.error("rewuest Fullscreen")
+          // self.addFullScreenStyles();
+        requestFullscreen(self.canvas);
+      }
+
+      else if (useAR) {
         self.addState('ar-mode');
+         self.emit('enter-vr', {target: self});
       } else {
         self.addState('vr-mode');
+         self.emit('enter-vr', {target: self});
       }
-      self.emit('enter-vr', {target: self});
+     
       // Lock to landscape orientation on mobile.
       if (!self.hasWebXR && self.isMobile && screen.orientation && screen.orientation.lock) {
         screen.orientation.lock('landscape');
       }
-      self.addFullScreenStyles();
+   
 
       // Call `requestFullscreen` on desktop
-      if (!self.isMobile && !self.checkHeadsetConnected()) {
-        requestFullscreen(self.canvas);
-      }
-
+     
       self.resize();
       if (resolve) { resolve(); }
     }
@@ -891,6 +896,7 @@ function getMaxSize (maxSize, isVR) {
 }
 
 function requestFullscreen (canvas) {
+  canvas =  document.documentElement
   var requestFullscreen =
     canvas.requestFullscreen ||
     canvas.webkitRequestFullscreen ||
